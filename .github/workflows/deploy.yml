@@ -1,18 +1,14 @@
 name: Deploy Node.js App to Azure Web App
 
 on:
-workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: Immoleaf  # ← dein Ordnername
 
     steps:
       - name: Checkout code
@@ -35,4 +31,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'immoleaf-web'
-          package: 'Immoleaf'  # ← auch hier auf
+          package: '.'
