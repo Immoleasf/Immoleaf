@@ -1,40 +1,27 @@
 const express = require('express');
-const path = require('path');
 const connectDB = require('./db');
 const User = require('./models/User');
-const Company = require('./models/Company');
+const Company = require('./models/Company'); // Optional, falls schon vorhanden
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Static HTML
+// Root route
 app.get('/', (req, res) => {
-  res.send(`
-    <h1>✅ Immoleaf Backend</h1>
-    <p><a href="/api">API Übersicht anzeigen</a></p>
-    <hr />
-    <h2>Testfirma anlegen</h2>
-    <form method="POST" action="/api/companies">
-      <label>Tenant ID:</label><br />
-      <input name="tenantId" required /><br />
-      <label>Firmenname:</label><br />
-      <input name="name" required /><br />
-      <label>Branche:</label><br />
-      <input name="industry" /><br />
-      <button type="submit">Absenden</button>
-    </form>
-  `);
+  res.send('✅ Hello from Immoleaf backend!');
 });
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Backend is alive ✅' });
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is alive ✅',
+  });
 });
 
-// API Übersicht
+// API Übersicht (JSON)
 app.get('/api', (req, res) => {
   res.status(200).json({
     routes: {
@@ -42,17 +29,40 @@ app.get('/api', (req, res) => {
       '/api/health': 'Health check',
       '/api/users': {
         GET: 'Liste aller Benutzer',
-        POST: 'Neuen Benutzer anlegen (name, email)'
+        POST: 'Erstelle einen neuen Benutzer (name, email)',
       },
-      '/api/companies': {
-        GET: 'Liste aller Firmen (Query: tenantId)',
-        POST: 'Firma anlegen (name, industry, tenantId)'
-      }
-    }
+      '/api/docs': 'HTML Admin-Übersicht für APIs',
+    },
   });
 });
 
-// Users
+// 📄 HTML-Dokumentation
+app.get('/api/docs', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>Immoleaf API Übersicht</title>
+        <style>
+          body { font-family: sans-serif; line-height: 1.6; padding: 2rem; }
+          h1 { color: #2b7cff; }
+          code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+          a { text-decoration: none; color: #2b7cff; }
+        </style>
+      </head>
+      <body>
+        <h1>📘 Immoleaf API Übersicht</h1>
+        <ul>
+          <li><a href="/api/health">/api/health</a> – Health check</li>
+          <li><a href="/api/users">/api/users</a> – Alle Benutzer (GET)</li>
+          <li><code>POST /api/users</code> – Benutzer anlegen (name, email)</li>
+        </ul>
+        <p>→ Diese Seite kann später mit Swagger oder Redoc ersetzt werden.</p>
+      </body>
+    </html>
+  `);
+});
+
+// Benutzer anlegen
 app.post('/api/users', async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -64,6 +74,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
+// Benutzer auflisten
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
@@ -73,31 +84,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Companies
-app.post('/api/companies', async (req, res) => {
-  try {
-    const { name, industry, tenantId } = req.body;
-    const company = new Company({ name, industry, tenantId });
-    await company.save();
-    res.status(201).json(company);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.get('/api/companies', async (req, res) => {
-  try {
-    const { tenantId } = req.query;
-    if (!tenantId) return res.status(400).json({ error: 'tenantId ist erforderlich' });
-
-    const companies = await Company.find({ tenantId }).sort({ createdAt: -1 });
-    res.status(200).json(companies);
-  } catch (err) {
-    res.status(500).json({ error: 'Fehler beim Laden der Firmen' });
-  }
-});
-
-// Starte Server
+// Server starten
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
