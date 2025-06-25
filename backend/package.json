@@ -1,7 +1,6 @@
 {
   "name": "immoleaf-backend",
   "version": "1.0.0",
-  "description": "Immoleaf backend server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
