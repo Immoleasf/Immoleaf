@@ -14,18 +14,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
 
-      - name: Zip project
-        run: zip -r deploy.zip .
+      - name: Zip app for deployment
+        run: |
+          mkdir deploy
+          cp -r index.js db.js package.json node_modules deploy/
+          zip -r deploy.zip deploy
 
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -35,4 +39,4 @@ jobs:
         with:
           app-name: 'immoleaf-backend'
           slot-name: 'production'
-          package: './deploy.zip'
+          package: deploy.zip
