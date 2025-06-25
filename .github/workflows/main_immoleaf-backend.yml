@@ -1,3 +1,4 @@
+# .github/workflows/main_immoleaf-backend.yml
 name: Deploy Immoleaf Backend to Azure
 
 on:
@@ -11,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -20,14 +21,10 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
-      - name: Zip app for deployment
-        run: |
-          mkdir deploy
-          cp -r index.js db.js package.json node_modules deploy/
-          zip -r deploy.zip deploy
+      - name: Create deployment zip
+        run: zip -r deploy.zip .
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -39,4 +36,4 @@ jobs:
         with:
           app-name: 'immoleaf-backend'
           slot-name: 'production'
-          package: deploy.zip
+          package: ./deploy.zip
