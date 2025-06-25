@@ -7,17 +7,20 @@ const port = process.env.PORT || 8080;
 // Middleware
 app.use(express.json());
 
-// Health route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend is alive ✅' });
-});
-
-// Default route
+// Root route
 app.get('/', (req, res) => {
   res.send('✅ Hello from Immoleaf backend!');
 });
 
-// DB connection & Server start
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is alive ✅',
+  });
+});
+
+// Connect to DB and start server
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
