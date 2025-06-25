@@ -1,33 +1,40 @@
 // index.js
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const authRoutes = require('./api/routes/auth');
+const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+const path = require("path");
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
-// Middleware
+// 1) Datenbank-Verbindung
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✔️ Mit MongoDB verbunden"))
+  .catch((err) => {
+    console.error("❌ MongoDB-Verbindungsfehler:", err);
+    process.exit(1);
+  });
+
+// 2) Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Serve React build
+app.use(express.static(path.join(__dirname, "frontend/build")));
 
-// Routes
-app.use('/api/auth', authRoutes);
+// 3) API-Routen
+// Hier holen wir uns den Router aus /api/index.js
+app.use("/api", require("./api"));
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('Immoleaf API is running 🚀');
+// 4) Catch-all Route für das Frontend (SPA)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/build", "index.html"));
 });
 
-// MongoDB connect
-mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB');
-  app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
-})
-.catch(err => {
-  console.error('❌ MongoDB connection error:', err.message);
+// 5) Server starten
+app.listen(PORT, () => {
+  console.log(`🚀 Server läuft auf Port ${PORT}`);
 });
