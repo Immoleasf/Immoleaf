@@ -1,7 +1,9 @@
 const express = require('express');
 const connectDB = require('./db');
 const User = require('./models/User');
-const Company = require('./models/Company'); // Falls vorhanden
+const Company = require('./models/Company'); // Optional
+const authMiddleware = require('./middleware/auth');
+const authRoutes = require('./routes/auth');
 
 // 🔹 Swagger Setup
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -18,7 +20,7 @@ const swaggerSpec = swaggerJsdoc({
     info: {
       title: 'Immoleaf API',
       version: '1.0.0',
-      description: 'CRM Backend API für Immoleaf',
+      description: 'CRM Backend API für Immoleaf mit Authentifizierung',
     },
     servers: [
       {
@@ -26,10 +28,10 @@ const swaggerSpec = swaggerJsdoc({
       },
     ],
   },
-  apis: ['./index.js'], // Nur index.js kommentiert
+  apis: ['./index.js'],
 });
 
-// ✅ Swagger UI unter /api/swagger und /api/docs
+// ✅ Swagger UI
 app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -37,7 +39,9 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * @swagger
  * /api/users:
  *   get:
- *     summary: Alle Benutzer abrufen
+ *     summary: Alle Benutzer abrufen (auth erforderlich)
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Liste aller Benutzer
@@ -62,17 +66,14 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         description: Benutzer erfolgreich erstellt
  */
 
-// ✅ Root route
+// ✅ Root
 app.get('/', (req, res) => {
   res.send('✅ Hello from Immoleaf backend!');
 });
 
-// ✅ Health check
+// ✅ Health Check
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    message: 'Backend is alive ✅',
-  });
+  res.status(200).json({ status: 'ok', message: 'Backend is alive ✅' });
 });
 
 // ✅ JSON API Übersicht
@@ -82,39 +83,41 @@ app.get('/api', (req, res) => {
       '/api': 'Übersicht der API-Endpunkte',
       '/api/health': 'Health check',
       '/api/users': {
-        GET: 'Liste aller Benutzer',
-        POST: 'Erstelle einen neuen Benutzer (name, email)',
+        GET: 'Liste aller Benutzer (auth erforderlich)',
+        POST: 'Erstelle neuen Benutzer (name, email)',
       },
-      '/api/swagger': 'Swagger UI (API-Dokumentation)',
-      '/api/docs': 'Swagger UI (API-Dokumentation)',
+      '/api/auth/register': 'Benutzer registrieren',
+      '/api/auth/login': 'Login mit JWT-Token',
+      '/api/swagger': 'Swagger UI',
+      '/api/docs': 'Swagger UI',
     },
   });
 });
 
-// ✅ Benutzer anlegen
+// ✅ Auth-Routen einbinden
+app.use('/api/auth', authRoutes);
+
+// ✅ Benutzer anlegen (öffentlich)
 app.post('/api/users', async (req, res) => {
   try {
     const { name, email } = req.body;
     if (!name || !email) {
       return res.status(400).json({ error: 'Name und E-Mail sind erforderlich' });
     }
-
-    const user = new User({ name, email });
+    const user = new User({ name, email, tenantId: 'demo' });
     await user.save();
     res.status(201).json(user);
   } catch (err) {
-    console.error('❌ Fehler beim Erstellen:', err.message);
     res.status(400).json({ error: err.message });
   }
 });
 
-// ✅ Benutzer abrufen
-app.get('/api/users', async (req, res) => {
+// ✅ Benutzer abrufen (auth erforderlich)
+app.get('/api/users', authMiddleware, async (req, res) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
+    const users = await User.find({ tenantId: req.user.tenantId }).sort({ createdAt: -1 });
     res.status(200).json(users);
   } catch (err) {
-    console.error('❌ Fehler beim Abrufen:', err.message);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
