@@ -1,2 +1,3 @@
 DATABASE_URL=mongodb://immoleaf-mongo:MshLvUA0KdCYTK8z75qrfAVueLyFX2zLP7VpDO4iisnts15jloL65TLfJrr4aigiAWwlCxN6D7ClACDbYJIm6A==@immoleaf-mongo.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@immoleaf-mongo@
 PORT=8080
+JWT_SECRET=immoleaf_super_secret_token_xyz
