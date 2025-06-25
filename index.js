@@ -20,16 +20,31 @@ const swaggerSpec = swaggerJsdoc({
     info: {
       title: 'Immoleaf API',
       version: '1.0.0',
-      description: 'CRM Backend API für Immoleaf mit Authentifizierung',
+      description: 'CRM Backend API für Immoleaf mit JWT-Auth',
     },
     servers: [
       {
         url: 'https://immoleaf-backend-h6f9g5bzc8aqh8f5.westeurope-01.azurewebsites.net',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ['./index.js'],
 });
+
 
 // ✅ Swagger UI
 app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
