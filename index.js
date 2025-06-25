@@ -1,11 +1,10 @@
 const express = require('express');
 const connectDB = require('./db');
 const User = require('./models/User');
-const Company = require('./models/Company'); // Optional
+const Company = require('./models/Company'); // optional
 const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 
-// 🔹 Swagger Setup
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -13,14 +12,14 @@ const app = express();
 const port = process.env.PORT || 8080;
 app.use(express.json());
 
-// 🔹 Swagger Definition
+/** 🔹 Swagger Definition */
 const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'Immoleaf API',
       version: '1.0.0',
-      description: 'CRM Backend API für Immoleaf mit JWT-Auth',
+      description: 'CRM Backend API für Immoleaf mit JWT Auth',
     },
     servers: [
       {
@@ -45,8 +44,7 @@ const swaggerSpec = swaggerJsdoc({
   apis: ['./index.js'],
 });
 
-
-// ✅ Swagger UI
+/** 🔹 Swagger UI Routen */
 app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -54,7 +52,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * @swagger
  * /api/users:
  *   get:
- *     summary: Alle Benutzer abrufen (auth erforderlich)
+ *     summary: Liste aller Benutzer (auth erforderlich)
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -81,7 +79,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         description: Benutzer erfolgreich erstellt
  */
 
-// ✅ Root
+// ✅ Root Route
 app.get('/', (req, res) => {
   res.send('✅ Hello from Immoleaf backend!');
 });
@@ -91,25 +89,25 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is alive ✅' });
 });
 
-// ✅ JSON API Übersicht
+// ✅ API Übersicht
 app.get('/api', (req, res) => {
   res.status(200).json({
     routes: {
-      '/api': 'Übersicht der API-Endpunkte',
-      '/api/health': 'Health check',
+      '/api': 'API Übersicht',
+      '/api/health': 'Health Check',
       '/api/users': {
-        GET: 'Liste aller Benutzer (auth erforderlich)',
-        POST: 'Erstelle neuen Benutzer (name, email)',
+        GET: 'Liste aller Benutzer (auth)',
+        POST: 'Benutzer anlegen (name, email)',
       },
-      '/api/auth/register': 'Benutzer registrieren',
-      '/api/auth/login': 'Login mit JWT-Token',
+      '/api/auth/register': 'User registrieren',
+      '/api/auth/login': 'JWT Login',
       '/api/swagger': 'Swagger UI',
-      '/api/docs': 'Swagger UI',
+      '/api/docs': 'Swagger UI Alias',
     },
   });
 });
 
-// ✅ Auth-Routen einbinden
+// ✅ Auth-Routen
 app.use('/api/auth', authRoutes);
 
 // ✅ Benutzer anlegen (öffentlich)
@@ -119,7 +117,8 @@ app.post('/api/users', async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({ error: 'Name und E-Mail sind erforderlich' });
     }
-    const user = new User({ name, email, tenantId: 'demo' });
+
+    const user = new User({ name, email, tenantId: 'demo' }); // default Tenant
     await user.save();
     res.status(201).json(user);
   } catch (err) {
@@ -137,7 +136,7 @@ app.get('/api/users', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Server starten
+// ✅ DB verbinden & Server starten
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
