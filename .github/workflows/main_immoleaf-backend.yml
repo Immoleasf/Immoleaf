@@ -37,3 +37,4 @@ jobs:
           app-name: 'immoleaf-backend'
           slot-name: 'production'
           package: ./deploy.zip
+
