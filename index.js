@@ -21,25 +21,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Übersicht aller API-Routen
+// API Übersicht
 app.get('/api', (req, res) => {
   res.status(200).json({
     routes: {
       '/api': 'Übersicht der API-Endpunkte',
       '/api/health': 'Health check',
       '/api/users': {
-        GET: 'Liste aller Benutzer',
-        POST: 'Erstelle einen neuen Benutzer (name, email)',
+        GET: 'Liste aller Benutzer für einen Mandanten (Query: tenantId)',
+        POST: 'Erstelle einen Benutzer (name, email, tenantId)',
       },
     },
   });
 });
 
-// Neue User erstellen
+// Benutzer erstellen
 app.post('/api/users', async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const user = new User({ name, email });
+    const { name, email, tenantId } = req.body;
+
+    if (!tenantId) {
+      return res.status(400).json({ error: 'tenantId ist erforderlich' });
+    }
+
+    const user = new User({ name, email, tenantId });
     await user.save();
     res.status(201).json(user);
   } catch (err) {
@@ -47,17 +52,23 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Alle User abrufen
+// Benutzer abrufen (nach tenantId)
 app.get('/api/users', async (req, res) => {
+  const { tenantId } = req.query;
+
+  if (!tenantId) {
+    return res.status(400).json({ error: 'tenantId Query-Parameter ist erforderlich' });
+  }
+
   try {
-    const users = await User.find().sort({ createdAt: -1 });
+    const users = await User.find({ tenantId }).sort({ createdAt: -1 });
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
-// Starte Server nach DB-Verbindung
+// DB verbinden und Server starten
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
