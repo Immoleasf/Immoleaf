@@ -20,8 +20,8 @@ jobs:
           node-version: '22.x'
 
       - name: Install dependencies & build
+        working-directory: ./backend
         run: |
-          cd backend
           npm install
           npm run build || echo "No build step"
 
