@@ -2,15 +2,19 @@ const express = require('express');
 const connectDB = require('./db');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
-// MongoDB verbinden
-connectDB();
+// Middleware
+app.use(express.json());
 
+// Routes
 app.get('/', (req, res) => {
-  res.send('Hello from Immoleaf backend!');
+  res.send('✅ Hello from Immoleaf backend!');
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+// DB connection & Server start
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+  });
 });
