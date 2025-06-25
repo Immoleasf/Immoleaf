@@ -19,29 +19,18 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Prepare clean deployment folder
-        run: |
-          mkdir deploy
-          cp -r backend/index.js deploy/
-          cp -r backend/package.json deploy/
-          cp -r backend/package-lock.json deploy/ || true
-          cp -r backend/dist deploy/dist || true
-
       - name: Install dependencies
-        working-directory: deploy
         run: npm install
 
-      - name: Create deployment zip
-        run: |
-          cd deploy
-          zip -r ../deploy.zip .
+      - name: Zip project
+        run: zip -r deploy.zip .
 
-      - name: Login to Azure
+      - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'immoleaf-backend'
