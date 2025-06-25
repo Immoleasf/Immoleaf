@@ -19,3 +19,16 @@ const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`🚀 Server listening on port ${port}`);
 });
+
+
+app.get("/check-db", async (req, res) => {
+  try {
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    res.json({
+      status: "✅ Connected to DB",
+      collections: collections.map((c) => c.name),
+    });
+  } catch (err) {
+    res.status(500).json({ status: "❌ Error", message: err.message });
+  }
+});
