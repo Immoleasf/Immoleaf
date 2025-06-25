@@ -1,7 +1,5 @@
 const express = require('express');
 const app = express();
-
-// Azure erwartet, dass du auf process.env.PORT hörst
 const port = process.env.PORT || 8080;
 
 app.get('/', (_, res) => {
@@ -9,5 +7,5 @@ app.get('/', (_, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
