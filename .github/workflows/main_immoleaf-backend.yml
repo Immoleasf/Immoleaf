@@ -25,10 +25,13 @@ jobs:
           npm install
           npm run build || echo "No build step"
 
-      - name: Prepare clean deployment folder
-        run: |
-          mkdir -p deploy
-          cp -r backend/* deploy/
+     - name: Prepare clean deployment folder (flattened)
+  run: |
+    mkdir deploy
+    cp -r backend/index.js deploy/
+    cp -r backend/package.json deploy/
+    cp -r backend/package-lock.json deploy/ || true
+    cp -r backend/dist deploy/dist || true
 
       - name: Zip deployment contents
         run: |
