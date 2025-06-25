@@ -29,8 +29,9 @@ const swaggerSpec = swaggerJsdoc({
   apis: ['./index.js'], // Nur index.js kommentiert
 });
 
-// ✅ Swagger UI unter /api/swagger
+// ✅ Swagger UI unter /api/swagger und /api/docs
 app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
  * @swagger
@@ -85,6 +86,7 @@ app.get('/api', (req, res) => {
         POST: 'Erstelle einen neuen Benutzer (name, email)',
       },
       '/api/swagger': 'Swagger UI (API-Dokumentation)',
+      '/api/docs': 'Swagger UI (API-Dokumentation)',
     },
   });
 });
