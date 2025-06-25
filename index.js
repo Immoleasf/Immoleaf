@@ -1,19 +1,19 @@
 const express = require('express');
 const connectDB = require('./db');
 const User = require('./models/User');
-const Company = require('./models/Company'); // Optional, falls schon vorhanden
+const Company = require('./models/Company'); // Falls Company bereits definiert
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
 
-// Root route
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('✅ Hello from Immoleaf backend!');
 });
 
-// Health check
+// ✅ Health check
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
@@ -21,7 +21,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Übersicht (JSON)
+// ✅ JSON API Übersicht
 app.get('/api', (req, res) => {
   res.status(200).json({
     routes: {
@@ -36,7 +36,7 @@ app.get('/api', (req, res) => {
   });
 });
 
-// 📄 HTML-Dokumentation
+// ✅ HTML-Dokumentation
 app.get('/api/docs', (req, res) => {
   res.send(`
     <html>
@@ -53,38 +53,44 @@ app.get('/api/docs', (req, res) => {
         <h1>📘 Immoleaf API Übersicht</h1>
         <ul>
           <li><a href="/api/health">/api/health</a> – Health check</li>
-          <li><a href="/api/users">/api/users</a> – Alle Benutzer (GET)</li>
-          <li><code>POST /api/users</code> – Benutzer anlegen (name, email)</li>
+          <li><a href="/api/users">/api/users</a> – Benutzer abrufen (GET)</li>
+          <li><code>POST /api/users</code> – Benutzer anlegen mit JSON { name, email }</li>
         </ul>
-        <p>→ Diese Seite kann später mit Swagger oder Redoc ersetzt werden.</p>
+        <p>→ Diese Seite kann später durch Swagger, Redoc oder eine eigene Admin-Oberfläche ersetzt werden.</p>
       </body>
     </html>
   `);
 });
 
-// Benutzer anlegen
+// ✅ Benutzer anlegen
 app.post('/api/users', async (req, res) => {
   try {
     const { name, email } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name und E-Mail sind erforderlich' });
+    }
+
     const user = new User({ name, email });
     await user.save();
     res.status(201).json(user);
   } catch (err) {
+    console.error('❌ Fehler beim Erstellen:', err.message);
     res.status(400).json({ error: err.message });
   }
 });
 
-// Benutzer auflisten
+// ✅ Benutzer abrufen
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
     res.status(200).json(users);
   } catch (err) {
+    console.error('❌ Fehler beim Abrufen:', err.message);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
-// Server starten
+// ✅ Server starten nach erfolgreicher DB-Verbindung
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
