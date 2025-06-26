@@ -44,4 +44,4 @@ jobs:
         with:
           app-name: 'immoleaf-frontend'
           slot-name: 'Production'
-          package: ./frontend.zip
+          package: /frontend.zip
