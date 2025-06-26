@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '**'
+      - 'backend/**'
       - '.github/workflows/main_immoleaf-backend.yml'
   workflow_dispatch:
 
