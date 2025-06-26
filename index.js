@@ -41,7 +41,7 @@ const swaggerSpec = swaggerJsdoc({
       },
     ],
   },
-  apis: ['./index.js'],
+  apis: ['./index.js', './routes/*.js'],
 });
 
 /** 🔹 Swagger UI Routen */
