@@ -1,9 +1,10 @@
 const express = require('express');
 const connectDB = require('./db');
 const User = require('./models/User');
-const Company = require('./models/Company'); // optional
+const Company = require('./models/Company');
 const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
+const companyRoutes = require('./routes/company'); // ✅ NEU
 
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -99,6 +100,10 @@ app.get('/api', (req, res) => {
         GET: 'Liste aller Benutzer (auth)',
         POST: 'Benutzer anlegen (name, email)',
       },
+      '/api/companies': {
+        GET: 'Liste aller Firmen (auth)',
+        POST: 'Firma anlegen (name, industry, location)',
+      },
       '/api/auth/register': 'User registrieren',
       '/api/auth/login': 'JWT Login',
       '/api/swagger': 'Swagger UI',
@@ -118,7 +123,7 @@ app.post('/api/users', async (req, res) => {
       return res.status(400).json({ error: 'Name und E-Mail sind erforderlich' });
     }
 
-    const user = new User({ name, email, tenantId: 'demo' }); // default Tenant
+    const user = new User({ name, email, tenantId: 'demo' }); // 🔹 Demo Tenant
     await user.save();
     res.status(201).json(user);
   } catch (err) {
@@ -136,7 +141,10 @@ app.get('/api/users', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ DB verbinden & Server starten
+// ✅ Firmen-Routen (auth erforderlich)
+app.use('/api/companies', companyRoutes);
+
+// ✅ Server starten
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
