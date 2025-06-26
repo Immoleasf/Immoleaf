@@ -1,0 +1,13 @@
+{
+  "name": "immoleaf-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "start": "echo 'Lokaler Start nicht verfügbar. Bitte in Vercel oder anderem Hoster verwenden.'",
+    "build": "echo 'Build wird automatisch durch Hosting-Plattform erstellt.'"
+  }
+}
