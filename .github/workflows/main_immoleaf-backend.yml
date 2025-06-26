@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
+      - '**'
       - '.github/workflows/main_immoleaf-backend.yml'
   workflow_dispatch:
 
@@ -22,8 +22,7 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install backend dependencies
-        working-directory: ./backend
+      - name: Install dependencies (backend root)
         run: npm install
 
       - name: Azure Login
@@ -35,4 +34,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'immoleaf-backend'
-          package: ./backend
+          package: .
