@@ -6,7 +6,41 @@ const User = require('../models/User');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'immoleaf-secret';
 
-// 🟢 Registrierung
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registriert einen neuen Benutzer
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - tenantId
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               tenantId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Benutzer erfolgreich registriert
+ *       400:
+ *         description: Fehlerhafte Eingabe
+ *       500:
+ *         description: Registrierung fehlgeschlagen
+ */
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, tenantId } = req.body;
@@ -27,7 +61,42 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// 🟢 Login
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login mit E-Mail und Passwort
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Erfolgreich eingeloggt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Ungültige Zugangsdaten
+ *       500:
+ *         description: Login fehlgeschlagen
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
