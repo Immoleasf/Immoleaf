@@ -78,8 +78,6 @@ Das generiert ein statisches Build unter `dist/`, bereit für Deployment.
 
 Derzeit ist kein automatisches Deployment eingerichtet. Optionen:
 
-- Vercel (empfohlen)
-- Netlify
 - Azure Static Web App
 
 Ein GitHub Actions Workflow kann leicht ergänzt werden.
