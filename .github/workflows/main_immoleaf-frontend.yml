@@ -7,15 +7,11 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/main_immoleaf-frontend.yml'
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./frontend
 
     steps:
       - name: Checkout code
@@ -28,24 +24,26 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./frontend
 
       - name: Build Vite frontend
         run: npm run build
+        working-directory: ./frontend
 
       - name: Zip artifact for deployment
         run: zip -r release.zip dist
+        working-directory: ./frontend
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: ./frontend/release.zip
+          path: frontend/release.zip
 
       - name: Download artifact for deployment
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist
-          path: .
 
       - name: Login to Azure
         uses: azure/login@v2
