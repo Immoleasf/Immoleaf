@@ -1,4 +1,4 @@
-name: Build and deploy Frontend to Azure Web App
+name: Build and deploy Node.js app to Azure Web App - immoleaf-frontend
 
 on:
   push:
@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -20,46 +18,42 @@ jobs:
         with: 
           node-version: '22.x'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Install dependencies
+        run: npm install
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: Build the frontend
+        run: npm run build
+
+      - name: Zip build artifact for deployment
+        run: zip -r release.zip ./dist
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-app
+          name: node-app
           path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: frontend-app
+          name: node-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Login to Azure using AZURE_CREDENTIALS
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'immoleaf-frontend'
           slot-name: 'Production'
-          package: ./
+          package: ./dist
