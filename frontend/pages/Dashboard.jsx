@@ -1,3 +1,5 @@
+// src/pages/Dashboard.jsx
+import React from 'react'
 import Header from '../components/Header'
 import CompanyList from '../components/CompanyList'
 
