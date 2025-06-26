@@ -26,9 +26,13 @@ jobs:
         run: npm install
         working-directory: ./frontend
 
-      - name: Build Vite frontend
+      - name: Build frontend with Vite
         run: npm run build
         working-directory: ./frontend
+
+      - name: Zip built frontend
+        run: zip -r ../frontend.zip .
+        working-directory: ./frontend/dist
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -40,4 +44,4 @@ jobs:
         with:
           app-name: 'immoleaf-frontend'
           slot-name: 'Production'
-          package: ./frontend/dist
+          package: ./frontend.zip
