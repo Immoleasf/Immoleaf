@@ -4,7 +4,9 @@ const User = require('./models/User');
 const Company = require('./models/Company');
 const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
-const companyRoutes = require('./routes/company'); // ✅ NEU
+const companyRoutes = require('./routes/company');
+app.use('/api/companies', companyRoutes);
+
 
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
