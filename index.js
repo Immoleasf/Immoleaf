@@ -5,17 +5,16 @@ const Company = require('./models/Company');
 const authMiddleware = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const companyRoutes = require('./routes/company');
-app.use('/api/companies', companyRoutes);
-
 
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-const app = express();
+const app = express(); // 🟢 app MUSS vor allen uses kommen
 const port = process.env.PORT || 8080;
+
 app.use(express.json());
 
-/** 🔹 Swagger Definition */
+/** 🔹 Swagger Setup */
 const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
@@ -47,7 +46,7 @@ const swaggerSpec = swaggerJsdoc({
   apis: ['./index.js', './routes/*.js'],
 });
 
-/** 🔹 Swagger UI Routen */
+/** 🔹 Swagger UI */
 app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -114,7 +113,7 @@ app.get('/api', (req, res) => {
   });
 });
 
-// ✅ Auth-Routen
+// ✅ Auth
 app.use('/api/auth', authRoutes);
 
 // ✅ Benutzer anlegen (öffentlich)
@@ -124,8 +123,7 @@ app.post('/api/users', async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({ error: 'Name und E-Mail sind erforderlich' });
     }
-
-    const user = new User({ name, email, tenantId: 'demo' }); // 🔹 Demo Tenant
+    const user = new User({ name, email, tenantId: 'demo' }); // demo tenant
     await user.save();
     res.status(201).json(user);
   } catch (err) {
@@ -146,7 +144,7 @@ app.get('/api/users', authMiddleware, async (req, res) => {
 // ✅ Firmen-Routen (auth erforderlich)
 app.use('/api/companies', companyRoutes);
 
-// ✅ Server starten
+// ✅ DB verbinden & Server starten
 connectDB().then(() => {
   app.listen(port, () => {
     console.log(`🚀 Server running on port ${port}`);
