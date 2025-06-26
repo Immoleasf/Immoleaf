@@ -1,13 +1,20 @@
 {
   "name": "immoleaf-frontend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "scripts": {
-    "start": "echo 'Lokaler Start nicht verfügbar. Bitte in Vercel oder anderem Hoster verwenden.'",
-    "build": "echo 'Build wird automatisch durch Hosting-Plattform erstellt.'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0"
   }
 }
